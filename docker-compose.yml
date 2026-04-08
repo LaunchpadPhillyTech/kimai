@@ -1,0 +1,59 @@
+services:
+  database:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-kimai}
+      - MYSQL_USER=${MYSQL_USER:-kimai}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-kimai123}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root123}
+    volumes:
+      - mysql:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    healthcheck:
+      test: mysqladmin -p$$MYSQL_ROOT_PASSWORD ping -h localhost
+      interval: 20s
+      start_period: 10s
+      timeout: 10s
+      retries: 3
+    # Security: Don't expose database port externally in production
+    # ports:
+    #   - "3306:3306"
+    networks:
+      - kimai_network
+
+  kimai: 
+    image: kimai/kimai2:apache
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - APP_ENV=${APP_ENV:-prod}
+      - APP_SECRET=${APP_SECRET:-change_this_32_character_secret_key}
+      - DATABASE_URL=mysql://${MYSQL_USER:-kimai}:${MYSQL_PASSWORD:-kimai123}@database/${MYSQL_DATABASE:-kimai}?charset=utf8&serverVersion=8.0.32
+      - TRUSTED_HOSTS=${TRUSTED_HOSTS:-}
+      - TRUSTED_PROXIES=${TRUSTED_PROXIES:-}
+      - MAILER_FROM=${MAILER_FROM:-kimai@localhost}
+      - MAILER_URL=${MAILER_URL:-null://localhost}
+    volumes:
+      - public:/opt/kimai/public
+      - var:/opt/kimai/var
+    ports:
+      - "${KIMAI_PORT:-8001}:8001"
+    restart: unless-stopped
+    networks:
+      - kimai_network
+    # Security headers and additional configuration can be added here
+    labels:
+      - "com.kimai.description=Kimai Time Tracking Application"
+      - "com.kimai.version=2.x"
+
+networks:
+  kimai_network:
+    driver: bridge
+    # Isolate services in their own network
+
+volumes:
+  mysql:
+  public:
+  var:

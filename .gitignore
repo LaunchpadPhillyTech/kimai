@@ -1,0 +1,91 @@
+# Environment files containing sensitive information
+.env
+.env.local
+.env.production
+.env.staging
+
+# Docker secrets
+secrets/
+*.secret
+*.key
+*.pem
+
+# Database dumps and backups
+*.sql
+*.sql.gz
+*.sql.bz2
+backup-*
+dump-*
+*.dump
+
+# Log files
+*.log
+logs/
+kimai/var/log/*
+
+# Cache and temporary files
+kimai/var/cache/*
+kimai/var/sessions/*
+kimai/var/tmp/*
+.tmp/
+temp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node modules and build artifacts
+node_modules/
+kimai/node_modules/
+kimai/public/build/
+kimai/public/bundles/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Composer
+kimai/vendor/
+composer.phar
+
+# Docker overrides and local configs
+docker-compose.override.yml
+docker-compose.local.yml
+
+# SSL certificates and keys
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# Personal notes and documentation
+NOTES.md
+TODO.md
+.notes/
+
+# Testing artifacts
+coverage/
+.nyc_output/
+.phpunit.result.cache
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files (unless specifically needed)
+*.tar.gz
+*.zip
+*.rar
+*.7z

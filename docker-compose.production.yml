@@ -1,0 +1,75 @@
+# Docker Compose Override for Production
+# Copy this file to docker-compose.override.yml and customize for your production environment
+
+version: '3.8'
+
+services:
+  database:
+    # Production database configuration
+    environment:
+      # Use Docker secrets in production instead of environment variables
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql_root_password
+      - MYSQL_PASSWORD_FILE=/run/secrets/mysql_password
+    # Uncomment to use specific MySQL configuration
+    # command: 
+    #   - --default-authentication-plugin=mysql_native_password
+    #   - --innodb-buffer-pool-size=1G
+    #   - --max-connections=200
+    #   - --query-cache-type=1
+    #   - --query-cache-size=256M
+    # Resource limits for production
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  kimai:
+    # Production Kimai configuration
+    environment:
+      - APP_ENV=prod
+      - APP_DEBUG=false
+      # Use secure random secret - never use default in production
+      - APP_SECRET_FILE=/run/secrets/app_secret
+    # Uncomment for production deployment with multiple replicas
+    # deploy:
+    #   replicas: 2
+    #   resources:
+    #     limits:
+    #       memory: 1G
+    #     reservations:
+    #       memory: 512M
+    # Uncomment to bind to specific interface only
+    # ports:
+    #   - "127.0.0.1:8001:8001"
+
+# Uncomment to use Docker secrets (recommended for production)
+# secrets:
+#   mysql_root_password:
+#     file: ./secrets/mysql_root_password.txt
+#   mysql_password:
+#     file: ./secrets/mysql_password.txt
+#   app_secret:
+#     file: ./secrets/app_secret.txt
+
+# Production volume configurations
+volumes:
+  mysql:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/kimai/mysql_data
+  public:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/kimai/public_data
+  var:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/kimai/var_data
